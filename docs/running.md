@@ -74,8 +74,8 @@ Try these commands in order to verify functionality:
 
 6. **Join Data**:
    ```sql
-   CREATE TABLE orders (oid INT, user_id INT, amount FLOAT);
-   INSERT INTO orders (oid, user_id, amount) VALUES (100, 1, 50.5);
+   CREATE TABLE orders (oid INT, user_id INT, amount INT);
+   INSERT INTO orders (oid, user_id, amount) VALUES (100, 1, 50);
    SELECT * FROM users JOIN orders ON users.id = orders.user_id;
    ```
 

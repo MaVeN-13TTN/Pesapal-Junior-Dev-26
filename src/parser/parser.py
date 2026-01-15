@@ -67,12 +67,14 @@ class SQLParser:
             
             is_primary = "PRIMARY KEY" in col_def.upper()
             is_unique = "UNIQUE" in col_def.upper()
+            is_not_null = "NOT NULL" in col_def.upper()
             
             columns.append({
                 "name": name,
                 "type": type_map[col_type_str],
                 "is_primary": is_primary,
-                "is_unique": is_unique
+                "is_unique": is_unique,
+                "nullable": not is_not_null
             })
             
         return CreateTableCommand(table_name, columns)

@@ -67,7 +67,8 @@ class Database:
                 c["name"], 
                 c["type"], 
                 is_primary=c["is_primary"], 
-                is_unique=c["is_unique"]
+                is_unique=c["is_unique"],
+                nullable=c.get("nullable", True)
             ) for c in cmd.columns
         ]
         self.create_table(Table(cmd.table_name, cols))

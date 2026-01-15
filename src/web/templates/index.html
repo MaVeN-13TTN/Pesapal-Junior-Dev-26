@@ -189,16 +189,16 @@
             if (!confirm("This will drop existing data and load demo data. Continue?")) return;
 
             const queries = [
-                "CREATE TABLE users (id INT PRIMARY KEY, name STRING, role STRING);",
-                "CREATE TABLE products (sku STRING PRIMARY KEY, name STRING, price FLOAT);",
-                "CREATE TABLE orders (oid INT PRIMARY KEY, user_id INT, amount FLOAT);",
-                "INSERT INTO users (id, name, role) VALUES (1, 'Jane Doe', 'Admin');",
-                "INSERT INTO users (id, name, role) VALUES (2, 'John Smith', 'User');",
-                "INSERT INTO users (id, name, role) VALUES (3, 'Alice Wonder', 'User');",
-                "INSERT INTO products (sku, name, price) VALUES ('A100', 'Mechanical Keyboard', 120.50);",
-                "INSERT INTO products (sku, name, price) VALUES ('B200', 'Gaming Mouse', 45.99);",
-                "INSERT INTO orders (oid, user_id, amount) VALUES (101, 1, 166.49);",
-                "INSERT INTO orders (oid, user_id, amount) VALUES (102, 2, 45.99);",
+                "CREATE TABLE users (id INT PRIMARY KEY, name STRING, age INT NOT NULL);",
+                "CREATE TABLE products (sku STRING PRIMARY KEY, name STRING, price INT);",
+                "CREATE TABLE orders (oid INT PRIMARY KEY, user_id INT, amount INT);",
+                "INSERT INTO users (id, name, age) VALUES (1, 'Jane Doe', 30);",
+                "INSERT INTO users (id, name, age) VALUES (2, 'John Smith', 25);",
+                "INSERT INTO users (id, name, age) VALUES (3, 'Alice Wonder', 28);",
+                "INSERT INTO products (sku, name, price) VALUES ('A100', 'Mechanical Keyboard', 121);",
+                "INSERT INTO products (sku, name, price) VALUES ('B200', 'Gaming Mouse', 46);",
+                "INSERT INTO orders (oid, user_id, amount) VALUES (101, 1, 166);",
+                "INSERT INTO orders (oid, user_id, amount) VALUES (102, 2, 46);",
                 "SELECT * FROM users JOIN orders ON users.id = orders.user_id;"
             ];
 
