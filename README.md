@@ -29,6 +29,7 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 ├── src/
 │   ├── db/          # Core Storage Engine & Table Logic
 │   ├── parser/      # Custom SQL Parser (Regex-based)
+│   ├── web/         # Frontend Templates (HTML/JS)
 │   ├── cli.py       # Interactive Command Line Interface
 │   └── app.py       # Flask Web Application Demo
 ├── docs/            # Detailed Documentation
