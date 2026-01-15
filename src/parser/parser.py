@@ -8,7 +8,7 @@ from .commands import (
 
 class SQLParser:
     def parse(self, query: str) -> Any:
-        query = query.strip()
+        query = query.strip().rstrip(';')
         if not query:
             raise ValueError("Empty query")
 
