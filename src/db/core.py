@@ -21,6 +21,20 @@ class Database:
         except Exception as e:
             return f"Error: {str(e)}"
 
+    def get_tables(self) -> Dict[str, Any]:
+        """Return metadata for all tables."""
+        return {
+            name: {
+                "columns": [
+                    {"name": col.name, "type": col.col_type.value} 
+                    for col in table.columns.values()
+                ],
+                "rows_count": len(table.rows)
+            }
+            for name, table in self.tables.items()
+        }
+
+
     def _execute_command(self, command: Any) -> Any:
         if isinstance(command, CreateTableCommand):
             return self._exec_create(command)

@@ -1,103 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesapal RDBMS Demo</title>
+    <title>Pesapal RDBMS Interface</title>
+    <!-- Tailwind CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <!-- CodeMirror -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <style>
+        .CodeMirror {
+            height: 12rem;
+            border-radius: 0.375rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
-    <div class="container mx-auto p-8">
-        <h1 class="text-3xl font-bold mb-4 text-purple-700">RDBMS Manager</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Query Section -->
-            <div class="bg-white p-6 rounded shadow">
-                <h2 class="text-xl font-bold mb-4">Execute Query</h2>
-                <form id="queryForm">
-                    <textarea id="sqlInput" class="w-full h-32 p-3 border rounded mb-4 font-mono text-sm" placeholder="SELECT * FROM table..."></textarea>
-                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Run SQL</button>
-                    <!-- Quick Actions -->
-                     <div class="mt-4 flex gap-2 flex-wrap">
-                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('CREATE TABLE demo (id INT PRIMARY KEY, name STRING)')">Create Table</button>
-                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('INSERT INTO demo (id, name) VALUES (1, \'Test User\')')">Insert</button>
-                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('SELECT * FROM demo')">Select All</button>
+<body class="bg-gray-100 font-sans h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-purple-700 text-white p-4 shadow-md flex justify-between items-center shrink-0">
+        <h1 class="text-xl font-bold flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4">
+                </path>
+            </svg>
+            Pesapal RDBMS Manager
+        </h1>
+        <div class="space-x-4">
+            <button onclick="loadDemoData()"
+                class="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded text-sm transition font-medium border border-purple-500">
+                Load Demo Data
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col overflow-y-auto shrink-0 z-10">
+            <div class="p-4 border-b border-gray-100 bg-gray-50">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Database Schema</h2>
+                <button onclick="fetchTables()" class="text-purple-600 text-xs hover:underline mt-1">Refresh</button>
+            </div>
+            <div id="schemaBrowser" class="flex-1 p-2 space-y-2">
+                <!-- Tables injected here -->
+                <div class="text-sm text-gray-500 p-2 italic">Loading tables...</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col p-6 overflow-hidden relative">
+
+            <!-- Editor Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 flex flex-col shrink-0">
+                <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-lg">
+                    <span class="text-sm font-medium text-gray-600">SQL Editor</span>
+                    <div class="flex gap-2">
+                        <button onclick="runQuery()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-1.5 rounded text-sm font-bold shadow-sm transition flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Run
+                        </button>
                     </div>
-                </form>
+                </div>
+                <div class="p-0">
+                    <textarea id="sqlInput" class="w-full"></textarea>
+                </div>
+            </div>
+
+            <!-- Error Alert (Hidden by default) -->
+            <div id="errorAlert" class="hidden mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
+                <div class="flex items-start">
+                    <div class="shrink-0 text-red-500">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Query Execution Error</h3>
+                        <div class="mt-1 text-sm text-red-700" id="errorMessage"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Results Section -->
-            <div class="bg-white p-6 rounded shadow overflow-x-auto">
-                <h2 class="text-xl font-bold mb-4">Results</h2>
-                <div id="resultsArea" class="text-sm">
-                    <p class="text-gray-500 italic">No results yet.</p>
+            <div class="bg-white flex-1 rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                <div class="p-3 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h2 class="text-sm font-medium text-gray-600">Results</h2>
+                    <!-- Recent Queries Dropdown could go here -->
+                </div>
+                <div class="overflow-auto flex-1 bg-white p-0 relative" id="resultsArea">
+                    <div class="flex items-center justify-center h-full text-gray-400 text-sm">
+                        Execute a query to see results here
+                    </div>
+                </div>
+
+                <!-- Footer / Status Bar -->
+                <div id="statusBar"
+                    class="bg-gray-800 text-gray-300 text-xs py-2 px-4 flex justify-between items-center border-t border-gray-700">
+                    <div class="flex gap-4">
+                        <span id="statusIndicator" class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-gray-500"></span> Ready
+                        </span>
+                        <span id="rowsAffected" class="hidden">Rows: <span class="font-mono text-white">0</span></span>
+                    </div>
+                    <div id="latency" class="font-mono text-gray-500"></div>
                 </div>
             </div>
-        </div>
+
+        </main>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/sql/sql.min.js"></script>
     <script>
-        function setInput(val) {
-            document.getElementById('sqlInput').value = val;
+        // Initialize CodeMirror
+        var editor = CodeMirror.fromTextArea(document.getElementById("sqlInput"), {
+            mode: "text/x-sql",
+            theme: "dracula",
+            lineNumbers: true,
+            indentWithTabs: true,
+            smartIndent: true,
+            matchBrackets: true,
+            autofocus: true
+        });
+        editor.setValue("SELECT * FROM users"); // Default value
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', fetchTables);
+
+        async function fetchTables() {
+            const browser = document.getElementById('schemaBrowser');
+            try {
+                const res = await fetch('/api/tables');
+                const tables = await res.json();
+
+                if (Object.keys(tables).length === 0) {
+                    browser.innerHTML = '<div class="p-3 text-sm text-gray-400 text-center">No tables found.<br>Create one!</div>';
+                    return;
+                }
+
+                let html = '';
+                for (const [name, data] of Object.entries(tables)) {
+                    html += `
+                        <div class="group">
+                            <div class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-purple-50 rounded cursor-pointer flex justify-between items-center" 
+                                 onclick="setTableQuery('${name}')">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    ${name}
+                                </span>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">${data.rows_count}</span>
+                            </div>
+                            <div class="pl-8 pr-2 py-1 text-xs text-gray-500 space-y-1 hidden group-hover:block transition-all">
+                                ${data.columns.map(c => `
+                                    <div class="flex justify-between">
+                                        <span class="font-mono text-gray-600">${c.name}</span>
+                                        <span class="text-purple-400 tracking-tighter" style="font-size: 0.65rem;">${c.type}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                browser.innerHTML = html;
+            } catch (err) {
+                browser.innerHTML = '<div class="text-red-500 text-xs p-2">Failed to load schema</div>';
+            }
         }
 
-        document.getElementById('queryForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const sql = document.getElementById('sqlInput').value;
+        function setTableQuery(tableName) {
+            editor.setValue(`SELECT * FROM ${tableName}`);
+        }
+
+        async function loadDemoData() {
+            if (!confirm("This will drop existing data and load demo data. Continue?")) return;
+
+            const queries = [
+                "CREATE TABLE users (id INT PRIMARY KEY, name STRING, role STRING)",
+                "CREATE TABLE products (sku STRING PRIMARY KEY, name STRING, price FLOAT)",
+                "CREATE TABLE orders (oid INT PRIMARY KEY, user_id INT, amount FLOAT)",
+                "INSERT INTO users (id, name, role) VALUES (1, 'Jane Doe', 'Admin')",
+                "INSERT INTO users (id, name, role) VALUES (2, 'John Smith', 'User')",
+                "INSERT INTO users (id, name, role) VALUES (3, 'Alice Wonder', 'User')",
+                "INSERT INTO products (sku, name, price) VALUES ('A100', 'Mechanical Keyboard', 120.50)",
+                "INSERT INTO products (sku, name, price) VALUES ('B200', 'Gaming Mouse', 45.99)",
+                "INSERT INTO orders (oid, user_id, amount) VALUES (101, 1, 166.49)",
+                "INSERT INTO orders (oid, user_id, amount) VALUES (102, 2, 45.99)",
+                "SELECT * FROM users JOIN orders ON users.id = orders.user_id"
+            ];
+
+            let lastResult = null;
+            document.getElementById('statusIndicator').innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Loading Preset...';
+
+            for (const q of queries) {
+                // Determine if this is a DROP command simulation (not supported yet essentially)
+                // Just running sequentially
+                try {
+                    const res = await fetch('/api/query', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: q })
+                    });
+                    lastResult = await res.json();
+                } catch (e) { console.error(e); }
+            }
+            fetchTables(); // Refresh Sidebar
+            renderResponse(lastResult);
+        }
+
+        async function runQuery() {
+            const sql = editor.getValue();
             const resultsDiv = document.getElementById('resultsArea');
-            
-            resultsDiv.innerHTML = '<p class="text-gray-500">Executing...</p>';
+            const errorDiv = document.getElementById('errorAlert');
+            const statusInd = document.getElementById('statusIndicator');
+
+            // Reset UI
+            errorDiv.classList.add('hidden');
+            statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Running...';
 
             try {
                 const res = await fetch('/api/query', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({query: sql})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: sql })
                 });
                 const data = await res.json();
-                
-                if (data.error) {
-                    resultsDiv.innerHTML = `<p class="text-red-500 font-bold">Error: ${data.error}</p>`;
-                    return;
-                }
-                
-                const result = data.result;
-                if (typeof result === 'string') {
-                     resultsDiv.innerHTML = `<p class="text-green-600 font-semibold">${result}</p>`;
-                } else if (Array.isArray(result)) {
-                    if (result.length === 0) {
-                        resultsDiv.innerHTML = '<p class="text-gray-500">Empty result set.</p>';
-                        return;
-                    }
-                    
-                    // Build table
-                    const headers = Object.keys(result[0]);
-                    let html = '<table class="min-w-full table-auto border-collapse border border-gray-200">';
-                    
-                    // Thead
-                    html += '<thead class="bg-gray-100"><tr>';
-                    headers.forEach(h => html += `<th class="px-4 py-2 border text-left">${h}</th>`);
-                    html += '</tr></thead>';
-                    
-                    // Tbody
-                    html += '<tbody>';
-                    result.forEach(row => {
-                        html += '<tr>';
-                        headers.forEach(h => html += `<td class="px-4 py-2 border">${row[h]}</td>`);
-                        html += '</tr>';
-                    });
-                    html += '</tbody></table>';
-                    
-                    resultsDiv.innerHTML = html;
-                } else {
-                     resultsDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+
+                renderResponse(data);
+
+                if (data.result && (sql.toUpperCase().includes('INSERT') || sql.toUpperCase().includes('CREATE') || sql.toUpperCase().includes('DELETE') || sql.toUpperCase().includes('UPDATE'))) {
+                    fetchTables(); // Refresh schema on write ops
                 }
 
             } catch (err) {
-                resultsDiv.innerHTML = `<p class="text-red-500">Network Error: ${err}</p>`;
+                renderError(err.toString());
             }
-        });
+        }
+
+        function renderResponse(data) {
+            const resultsDiv = document.getElementById('resultsArea');
+            const errorDiv = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const statusInd = document.getElementById('statusIndicator');
+            const rowsMeta = document.getElementById('rowsAffected');
+            const latencyBox = document.getElementById('latency');
+
+            if (data.error) {
+                renderError(data.error);
+                return;
+            }
+
+            // Success State
+            statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500"></span> ' + (data.meta?.status || "200 OK");
+
+            if (data.meta) {
+                rowsMeta.querySelector("span").innerText = data.meta.rows_affected;
+                rowsMeta.classList.remove('hidden');
+                latencyBox.innerText = `Time: ${data.meta.duration_seconds}s`;
+            }
+
+            const result = data.result;
+
+            if (typeof result === 'string') {
+                resultsDiv.innerHTML = `<div class="p-8 text-center text-green-600 font-medium text-lg flex flex-col items-center gap-2">
+                    <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    ${result}
+                 </div>`;
+            } else if (Array.isArray(result)) {
+                if (result.length === 0) {
+                    resultsDiv.innerHTML = '<div class="p-8 text-center text-gray-400">Query returned empty set.</div>';
+                    return;
+                }
+
+                // Build Table
+                const headers = Object.keys(result[0]);
+                let html = '<table class="w-full text-left border-collapse">';
+
+                // Header
+                html += '<thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider sticky top-0 shadow-sm"><tr>';
+                html += '<th class="px-6 py-3 font-semibold border-b border-gray-200 w-12">#</th>'; // Index col
+                headers.forEach(h => html += `<th class="px-6 py-3 font-semibold border-b border-gray-200">${h}</th>`);
+                html += '</tr></thead>';
+
+                // Body
+                html += '<tbody class="divide-y divide-gray-100">';
+                result.forEach((row, i) => {
+                    html += '<tr class="hover:bg-purple-50 transition-colors">';
+                    html += `<td class="px-6 py-3 text-gray-400 text-xs border-r border-gray-50">${i + 1}</td>`;
+                    headers.forEach(h => html += `<td class="px-6 py-3 text-sm text-gray-700 font-mono">${row[h]}</td>`);
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+
+                resultsDiv.innerHTML = html;
+            } else {
+                resultsDiv.innerHTML = `<pre class="p-4 text-xs font-mono text-gray-700">${JSON.stringify(result, null, 2)}</pre>`;
+            }
+        }
+
+        function renderError(msg) {
+            const errorDiv = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const statusInd = document.getElementById('statusIndicator');
+
+            statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span> Error';
+            errorDiv.classList.remove('hidden');
+            errorMessage.innerText = msg;
+        }
+
     </script>
 </body>
+
 </html>
