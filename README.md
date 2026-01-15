@@ -29,7 +29,7 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 .
 ├── src/
 │   ├── db/          # Core Storage Engine & Table Logic
-│   ├── parser/      # **Query Parser**: Custom Regex-based SQL parser supporting `CREATE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`, `JOIN`.
+│   ├── parser/      # Query Parser: Custom Regex-based SQL parser supporting `CREATE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`, `JOIN`.
 │   ├── web/         # Frontend Templates (HTML/JS)
 │   ├── cli.py       # Interactive Command Line Interface
 │   └── app.py       # Flask Web Application Demo
