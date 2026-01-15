@@ -9,6 +9,22 @@ I chose **Python** for this challenge for several strategic reasons:
 3.  **Data Structures**: Python's Dictionaries (`dict`) are highly optimized hash maps. Using them as the backbone for my In-Memory storage (`Table` rows and `Index`) ensures O(1) lookups for Primary Keys by default.
 4.  **Standard Library**: Modules like `cmd` (for the REPL) and `json` (for persistence) allowed me to implement complex features with zero external dependencies for the core engine.
 
+## What is the REPL?
+
+**REPL** stands for **Read-Eval-Print Loop**. It is an interactive programming environment that takes single user inputs, executes them, and returns the result to the user.
+
+- **Read**: The system accepts an SQL command from the user.
+- **Eval**: The system parses the command and executes the logic.
+- **Print**: The result (or error) is displayed in the terminal.
+- **Loop**: The system waits for the next command.
+
+### How I Achieved It
+Built-in Shell functionality is provided by Python's `cmd` module. By inheriting from `cmd.Cmd`, I created a robust command processor (`src/cli.py`) that:
+
+1.  **Loops Forever**: Automatically handles the input cycle.
+2.  **Abstractions**: It abstracts the complexity of `db.execute_query()`, allowing the user to focus solely on SQL.
+3.  **Persistence**: I hooked into the startup and shutdown methods to ensure `db.load()` happens on launch and `db.save()` happens on `exit`.
+
 ## Codebase Capabilities
 
 The project is structured to enforce separation of concerns:
