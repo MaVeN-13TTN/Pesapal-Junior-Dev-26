@@ -5,7 +5,7 @@
 I chose **Python** for this challenge for several strategic reasons:
 
 1.  **Rapid Prototyping**: Python's dynamic nature allowed me to build a working Parser, Storage Engine, and Web API in under 4 hours.
-2.  **String Manipulation**: The `re` (Regex) module in Python is world-class, making it the perfect choice for implementing a custom SQL parser without needing heavy dependencies like ANTLR.
+2.  **String Manipulation**: The `re` (Regex) module in Python is world-class, making it the perfect choice for implementing a custom SQL parser (including `JOIN`s) without needing heavy dependencies like ANTLR.
 3.  **Data Structures**: Python's Dictionaries (`dict`) are highly optimized hash maps. Using them as the backbone for my In-Memory storage (`Table` rows and `Index`) ensures O(1) lookups for Primary Keys by default.
 4.  **Standard Library**: Modules like `cmd` (for the REPL) and `json` (for persistence) allowed me to implement complex features with zero external dependencies for the core engine.
 

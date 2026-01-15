@@ -11,6 +11,7 @@ A custom-built Relational Database Management System (RDBMS) implemented in Pyth
 **Goal**: Design and implement a simple RDBMS with support for:
 - Table declarations & Data types (Integer, String, Float, Boolean)
 - CRUD Operations (Create, Read, Update, Delete)
+- JOINS (Inner Join)
 - Indexing (Primary & Unique Keys)
 - Interactive SQL Shell (REPL)
 - Demo Web Application
@@ -28,7 +29,7 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 .
 ├── src/
 │   ├── db/          # Core Storage Engine & Table Logic
-│   ├── parser/      # Custom SQL Parser (Regex-based)
+│   ├── parser/      # **Query Parser**: Custom Regex-based SQL parser supporting `CREATE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`, `JOIN`.
 │   ├── web/         # Frontend Templates (HTML/JS)
 │   ├── cli.py       # Interactive Command Line Interface
 │   └── app.py       # Flask Web Application Demo

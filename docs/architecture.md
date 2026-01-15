@@ -21,7 +21,7 @@ graph TD
   - *Benefit*: `SELECT * FROM users WHERE id=1` is O(1) instead of O(N).
 
 ### 2. Parsing Layer (`src/parser/`)
-The parser does not use a full grammar tree (AST) for simplicity. Instead, it uses **Regex Matching** to identify command types (`SELECT`, `INSERT`, etc.) and extract clauses (`WHERE`, `VALUES`).
+The parser does not use a full grammar tree (AST) for simplicity. Instead, it uses **Regex Matching** to identify command types (`SELECT`, `INSERT`, etc.) and extract clauses (`WHERE`, `VALUES`, `JOIN`, `ON`).
 
 ### 3. Interface Layer
 - **REPL**: Uses Python's `cmd` loop. It loads the DB on startup and saves on exit.

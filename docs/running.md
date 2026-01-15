@@ -72,6 +72,13 @@ Try these commands in order to verify functionality:
    DELETE FROM users WHERE id=2
    ```
 
+6. **Join Data**:
+   ```sql
+   CREATE TABLE orders (oid INT, user_id INT, amount FLOAT)
+   INSERT INTO orders (oid, user_id, amount) VALUES (100, 1, 50.5)
+   SELECT * FROM users JOIN orders ON users.id = orders.user_id
+   ```
+
 ### 2. Web Application Demo
 A browser-based interface to demonstrate the RDBMS in a real-world context (via a Flask API).
 
