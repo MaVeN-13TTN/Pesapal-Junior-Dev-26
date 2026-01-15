@@ -47,36 +47,36 @@ Try these commands in order to verify functionality:
 
 1. **Create a Table**:
    ```sql
-   CREATE TABLE users (id INT PRIMARY KEY, name STRING, age INT)
+   CREATE TABLE users (id INT PRIMARY KEY, name STRING, age INT);
    ```
 
 2. **Insert Data**:
    ```sql
-   INSERT INTO users (id, name, age) VALUES (1, "Alice", 30)
-   INSERT INTO users (id, name, age) VALUES (2, "Bob", 25)
+   INSERT INTO users (id, name, age) VALUES (1, "Alice", 30);
+   INSERT INTO users (id, name, age) VALUES (2, "Bob", 25);
    ```
 
 3. **Select Data**:
    ```sql
-   SELECT * FROM users
-   SELECT name FROM users WHERE age=30
+   SELECT * FROM users;
+   SELECT name FROM users WHERE age=30;
    ```
 
 4. **Update Data**:
    ```sql
-   UPDATE users SET age=31 WHERE name="Alice"
+   UPDATE users SET age=31 WHERE name="Alice";
    ```
 
 5. **Delete Data**:
    ```sql
-   DELETE FROM users WHERE id=2
+   DELETE FROM users WHERE id=2;
    ```
 
 6. **Join Data**:
    ```sql
-   CREATE TABLE orders (oid INT, user_id INT, amount FLOAT)
-   INSERT INTO orders (oid, user_id, amount) VALUES (100, 1, 50.5)
-   SELECT * FROM users JOIN orders ON users.id = orders.user_id
+   CREATE TABLE orders (oid INT, user_id INT, amount FLOAT);
+   INSERT INTO orders (oid, user_id, amount) VALUES (100, 1, 50.5);
+   SELECT * FROM users JOIN orders ON users.id = orders.user_id;
    ```
 
 ### 2. Web-Based DMI
@@ -88,6 +88,14 @@ python src/app.py
 
 - Open your browser to **[http://localhost:3000](http://localhost:3000)**.
 - The UI allows you to type raw SQL queries and visualize the results in a formatted table.
+
+**Load Demo Data Button**:
+Clicking this button triggers a preset scenario script that:
+1.  **Drops/Resets** existing tables (simulated if necessary).
+2.  **Creates** new tables (`users`, `products`, `orders`).
+3.  **Inserts** mock data into these tables.
+4.  **Runs** a `JOIN` query to demonstrate relationship querying.
+This acts as a "Smoke Test" to prove the engine handles complex, multi-statement workflows.
 
 ### 3. Automated Tests
 Run the test suite to verify the integrity of the storage engine and SQL parser.
