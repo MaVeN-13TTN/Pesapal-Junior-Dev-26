@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesapal RDBMS Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-4 text-purple-700">RDBMS Manager</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Query Section -->
+            <div class="bg-white p-6 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Execute Query</h2>
+                <form id="queryForm">
+                    <textarea id="sqlInput" class="w-full h-32 p-3 border rounded mb-4 font-mono text-sm" placeholder="SELECT * FROM table..."></textarea>
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Run SQL</button>
+                    <!-- Quick Actions -->
+                     <div class="mt-4 flex gap-2 flex-wrap">
+                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('CREATE TABLE demo (id INT PRIMARY KEY, name STRING)')">Create Table</button>
+                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('INSERT INTO demo (id, name) VALUES (1, \'Test User\')')">Insert</button>
+                        <button type="button" class="text-xs bg-gray-200 px-2 py-1 rounded" onclick="setInput('SELECT * FROM demo')">Select All</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="bg-white p-6 rounded shadow overflow-x-auto">
+                <h2 class="text-xl font-bold mb-4">Results</h2>
+                <div id="resultsArea" class="text-sm">
+                    <p class="text-gray-500 italic">No results yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setInput(val) {
+            document.getElementById('sqlInput').value = val;
+        }
+
+        document.getElementById('queryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sql = document.getElementById('sqlInput').value;
+            const resultsDiv = document.getElementById('resultsArea');
+            
+            resultsDiv.innerHTML = '<p class="text-gray-500">Executing...</p>';
+
+            try {
+                const res = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: sql})
+                });
+                const data = await res.json();
+                
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p class="text-red-500 font-bold">Error: ${data.error}</p>`;
+                    return;
+                }
+                
+                const result = data.result;
+                if (typeof result === 'string') {
+                     resultsDiv.innerHTML = `<p class="text-green-600 font-semibold">${result}</p>`;
+                } else if (Array.isArray(result)) {
+                    if (result.length === 0) {
+                        resultsDiv.innerHTML = '<p class="text-gray-500">Empty result set.</p>';
+                        return;
+                    }
+                    
+                    // Build table
+                    const headers = Object.keys(result[0]);
+                    let html = '<table class="min-w-full table-auto border-collapse border border-gray-200">';
+                    
+                    // Thead
+                    html += '<thead class="bg-gray-100"><tr>';
+                    headers.forEach(h => html += `<th class="px-4 py-2 border text-left">${h}</th>`);
+                    html += '</tr></thead>';
+                    
+                    // Tbody
+                    html += '<tbody>';
+                    result.forEach(row => {
+                        html += '<tr>';
+                        headers.forEach(h => html += `<td class="px-4 py-2 border">${row[h]}</td>`);
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+                    
+                    resultsDiv.innerHTML = html;
+                } else {
+                     resultsDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                }
+
+            } catch (err) {
+                resultsDiv.innerHTML = `<p class="text-red-500">Network Error: ${err}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
