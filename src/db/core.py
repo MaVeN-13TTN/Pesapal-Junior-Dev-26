@@ -16,8 +16,20 @@ class Database:
 
     def execute_query(self, query: str) -> Any:
         try:
-            command = self.parser.parse(query)
-            return self._execute_command(command)
+            # multiple commands support
+            raw_commands = [c.strip() for c in query.split(';') if c.strip()]
+            
+            results = []
+            for raw_cmd in raw_commands:
+                # We need to re-append ; for the parser if it expects it? 
+                # Actually parser strips it.
+                command = self.parser.parse(raw_cmd)
+                res = self._execute_command(command)
+                results.append(res)
+            
+            if len(results) == 1:
+                return results[0]
+            return results
         except Exception as e:
             return f"Error: {str(e)}"
 
