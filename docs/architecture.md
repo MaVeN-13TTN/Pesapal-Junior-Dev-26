@@ -12,7 +12,7 @@ graph TD
     Storage -->|JSON| Disk[db.json]
 ```
 
-## detailed Components
+## Detailed Components
 
 ### 1. Storage Layer (`src/db/`)
 - **Tables**: Stored as a Dictionary of `Table` objects.
