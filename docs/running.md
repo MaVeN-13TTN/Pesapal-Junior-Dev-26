@@ -42,6 +42,36 @@ python src/cli.py
   - Supports `WHERE` clauses (e.g., `WHERE id=1`).
 - `exit` or `quit`: Save to disk and close the REPL.
 
+#### Sample Workflow
+Try these commands in order to verify functionality:
+
+1. **Create a Table**:
+   ```sql
+   CREATE TABLE users (id INT PRIMARY KEY, name STRING, age INT)
+   ```
+
+2. **Insert Data**:
+   ```sql
+   INSERT INTO users (id, name, age) VALUES (1, "Alice", 30)
+   INSERT INTO users (id, name, age) VALUES (2, "Bob", 25)
+   ```
+
+3. **Select Data**:
+   ```sql
+   SELECT * FROM users
+   SELECT name FROM users WHERE age=30
+   ```
+
+4. **Update Data**:
+   ```sql
+   UPDATE users SET age=31 WHERE name="Alice"
+   ```
+
+5. **Delete Data**:
+   ```sql
+   DELETE FROM users WHERE id=2
+   ```
+
 ### 2. Web Application Demo
 A browser-based interface to demonstrate the RDBMS in a real-world context (via a Flask API).
 
@@ -58,3 +88,14 @@ Run the test suite to verify the integrity of the storage engine and SQL parser.
 ```bash
 pytest
 ```
+
+## Data Persistence & Resetting
+
+The database state is persisted to a file named `db.json` in the project root directory.
+
+- **Persistence**: Data is saved automatically when you exit the REPL or modify data via the Web App.
+- **Resetting**: To clear all data and start fresh, simply delete the `db.json` file:
+  ```bash
+  rm db.json
+  ```
+  The system will automatically create a new, empty database file on the next run.
