@@ -8,7 +8,6 @@ A custom-built Relational Database Management System (RDBMS) implemented in Pyth
 - **[Documentation](docs/documentation.md)**: Design choices, capabilities, and "Why Python?".
 
 ## Challenge Overview
-**Goal**: Design and implement a simple RDBMS with support for:
 - Table declarations & Data types (Integer, String, Float, Boolean)
 - CRUD Operations (Create, Read, Update, Delete)
 - JOINS (Inner Join)
@@ -16,7 +15,7 @@ A custom-built Relational Database Management System (RDBMS) implemented in Pyth
 - Interactive SQL Shell (REPL)
 - Demo Web Application
 
-**Deadline**: Jan 17th, 2026.
+
 
 ## One-Line Start
 ```bash
@@ -37,3 +36,5 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 ├── tests/           # Automated Test Suite
 └── db.json          # Persistent Storage File
 ```
+
+
