@@ -136,7 +136,7 @@
             matchBrackets: true,
             autofocus: true
         });
-        editor.setValue("SELECT * FROM users;"); // Default value
+        editor.setValue("-- Enter your SQL query here...\n-- Or click 'Load Demo Data' to get started."); // Default value
 
         // Initial Load
         document.addEventListener('DOMContentLoaded', fetchTables);
@@ -219,6 +219,8 @@
             }
             fetchTables(); // Refresh Sidebar
             renderResponse(lastResult);
+            // Pre-populate the editor with a sample query AFTER loading data, as requested
+            editor.setValue("SELECT * FROM users JOIN orders ON users.id = orders.user_id;");
         }
 
         async function runQuery() {
