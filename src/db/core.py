@@ -59,12 +59,56 @@ class Database:
         if not table:
             raise ValueError(f"Table '{cmd.table_name}' does not exist")
         
+        # 1. Base selection
         rows = table.select(cmd.where)
         
-        # Filter columns if not "*"
+        # 2. Handle JOIN
+        if cmd.join:
+            join_table_name = cmd.join["table"]
+            other_table = self.get_table(join_table_name)
+            if not other_table:
+                raise ValueError(f"Joined Table '{join_table_name}' does not exist")
+                
+            left_col = cmd.join["left_col"]
+            right_col = cmd.join["right_col"]
+            
+            joined_rows = []
+            
+            # Simple Nested Loop Join (O(N*M)) - Optimization: Index Lookup could be O(N)
+            # Check if right_col is indexed in other_table
+            # For this simple implementation, we'll do nested loop or use internal indices if primary
+            
+            for row in rows:
+                left_val = row.get(left_col)
+                if left_val is None: continue
+                
+                # Find matches in other_table
+                matches = []
+                # Check optimization: is right_col a primary key?
+                if right_col == "id" and other_table.columns["id"].is_primary: # Heuristic
+                     # Direct lookup if we had exposed index method.
+                     # For now, stick to linear scan of other_table OR use select on it
+                     pass
+
+                # Safer to just look up
+                # Note: This is an inner join
+                for other_row in other_table.rows:
+                    if other_row.get(right_col) == left_val:
+                         # Merge rows. 
+                         # Conflict resolution: prefix columns? 
+                         # For this challenge, simple merge, left priority
+                         new_row = {**row, **other_row} 
+                         # Ideally we should handle "table.col" syntax in select columns to disambiguate
+                         joined_rows.append(new_row)
+            
+            rows = joined_rows
+
+        # 3. Filter columns
         if cmd.columns and "*" not in cmd.columns:
             filtered_rows = []
             for row in rows:
+                # Handle prefixes? 
+                # For now, simple extraction.
                 new_row = {k: v for k, v in row.items() if k in cmd.columns}
                 filtered_rows.append(new_row)
             return filtered_rows

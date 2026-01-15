@@ -17,6 +17,8 @@ class SelectCommand:
     table_name: str
     columns: List[str] # "*" or specific columns
     where: Optional[Dict[str, Any]] = None
+    join: Optional[Dict[str, str]] = None # format: {table: "other_table", on_col: "col", target_col: "target_col"}
+
 
 @dataclass
 class UpdateCommand:

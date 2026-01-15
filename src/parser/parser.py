@@ -110,18 +110,53 @@ class SQLParser:
         return InsertCommand(table_name, parsed_vals)
 
     def _parse_select(self, query: str) -> SelectCommand:
-        match = re.search(r'SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.+))?', query, re.IGNORECASE)
+        # Improved regex to handle JOINs
+        # Pattern: SELECT cols FROM table [JOIN join_table ON cond] [WHERE cond]
+        
+        # Regex explanation:
+        # SELECT\s+(.+?)\s+FROM\s+(\w+)   -> Basic SELECT
+        # (?:\s+JOIN\s+(\w+)\s+ON\s+(.+?))? -> Optional JOIN group (table and condition)
+        # (?:\s+WHERE\s+(.+))?            -> Optional WHERE group (greedy match to end, might need refining if we have more clauses)
+        
+        match = re.search(r'SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+JOIN\s+(\w+)\s+ON\s+(.+?))?(?:\s+WHERE\s+(.+))?$', query, re.IGNORECASE)
         if not match:
-            raise ValueError("Invalid SELECT syntax")
-            
-        cols_str = match.group(1)
-        table_name = match.group(2)
-        where_clause = match.group(3)
+            # Fallback for simple SELECT if complex one fails (regexes can be finicky)
+            match = re.search(r'SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.+))?', query, re.IGNORECASE)
+            if not match:
+                raise ValueError("Invalid SELECT syntax")
+                
+            # If fallback matched, checking groups carefully
+            cols_str = match.group(1)
+            table_name = match.group(2)
+            join_table = None
+            join_condition = None
+            where_clause = match.group(3)
+        else:
+            cols_str = match.group(1)
+            table_name = match.group(2)
+            join_table = match.group(3)
+            join_condition = match.group(4)
+            where_clause = match.group(5)
         
         columns = [c.strip() for c in cols_str.split(',')]
+        
+        join_data = None
+        if join_table and join_condition:
+            # Parse JOIN condition: t1.col = t2.col
+            # Simple assumption: col1 = col2
+            j_match = re.search(r'(\w+\.\w+|\w+)\s*=\s*(\w+\.\w+|\w+)', join_condition)
+            if j_match:
+                left = j_match.group(1).split('.')[-1] # take col name only
+                right = j_match.group(2).split('.')[-1]
+                join_data = {
+                    "table": join_table,
+                    "left_col": left,
+                    "right_col": right
+                }
+        
         where = self._parse_where(where_clause) if where_clause else None
         
-        return SelectCommand(table_name, columns, where)
+        return SelectCommand(table_name, columns, where, join_data)
         
     def _parse_where(self, where_str: str) -> Dict[str, Any]:
         # Very simple WHERE parser: col = val
