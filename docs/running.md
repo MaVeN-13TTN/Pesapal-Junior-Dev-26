@@ -79,8 +79,8 @@ Try these commands in order to verify functionality:
    SELECT * FROM users JOIN orders ON users.id = orders.user_id
    ```
 
-### 2. Web Application Demo
-A browser-based interface to demonstrate the RDBMS in a real-world context (via a Flask API).
+### 2. Web-Based DMI
+A Database Management Interface with a Schema Browser, Smart Editor, and Metrics. Demo: A browser-based interface to demonstrate the RDBMS in a real-world context (via a Flask API).
 
 ```bash
 python src/app.py
