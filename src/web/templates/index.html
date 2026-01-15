@@ -325,32 +325,29 @@
             } else {
                 resultsDiv.innerHTML = `<pre class="p-4 text-xs font-mono text-gray-700">${JSON.stringify(result, null, 2)}</pre>`;
             }
-        }
 
-        function generateTableHtml(data) {
-            if (!data || data.length === 0) return '';
-            const headers = Object.keys(data[0]);
-            let html = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse">';
+            function generateTableHtml(data) {
+                if (!data || data.length === 0) return '';
+                const headers = Object.keys(data[0]);
+                let html = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse">';
 
-            // Header
-            html += '<thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider sticky top-0 shadow-sm"><tr>';
-            html += '<th class="px-6 py-3 font-semibold border-b border-gray-200 w-12">#</th>';
-            headers.forEach(h => html += `<th class="px-6 py-3 font-semibold border-b border-gray-200">${h}</th>`);
-            html += '</tr></thead>';
+                // Header
+                html += '<thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider sticky top-0 shadow-sm"><tr>';
+                html += '<th class="px-6 py-3 font-semibold border-b border-gray-200 w-12">#</th>';
+                headers.forEach(h => html += `<th class="px-6 py-3 font-semibold border-b border-gray-200">${h}</th>`);
+                html += '</tr></thead>';
 
-            // Body
-            html += '<tbody class="divide-y divide-gray-100">';
-            data.forEach((row, i) => {
-                html += '<tr class="hover:bg-purple-50 transition-colors">';
-                html += `<td class="px-6 py-3 text-gray-400 text-xs border-r border-gray-50">${i + 1}</td>`;
-                headers.forEach(h => html += `<td class="px-6 py-3 text-sm text-gray-700 font-mono">${row[h]}</td>`);
-                html += '</tr>';
-            });
-            html += '</tbody></table></div>';
-            return html;
-        } else {
-            resultsDiv.innerHTML = `<pre class="p-4 text-xs font-mono text-gray-700">${JSON.stringify(result, null, 2)}</pre>`;
-        }
+                // Body
+                html += '<tbody class="divide-y divide-gray-100">';
+                data.forEach((row, i) => {
+                    html += '<tr class="hover:bg-purple-50 transition-colors">';
+                    html += `<td class="px-6 py-3 text-gray-400 text-xs border-r border-gray-50">${i + 1}</td>`;
+                    headers.forEach(h => html += `<td class="px-6 py-3 text-sm text-gray-700 font-mono">${row[h]}</td>`);
+                    html += '</tr>';
+                });
+                html += '</tbody></table></div>';
+                return html;
+            }
         }
 
         function renderError(msg) {
