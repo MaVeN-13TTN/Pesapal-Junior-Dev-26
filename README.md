@@ -37,4 +37,10 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 └── db.json          # Persistent Storage File
 ```
 
+---
+<p align="center">
+  Developed by <a href="https://github.com/MaVeN-13TTN">MaVeN-13TTN 🚀</a>
+</p>
+
+
 
