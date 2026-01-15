@@ -1,8 +1,13 @@
 from flask import Flask, request, jsonify, render_template
-from src.db.core import Database
 import os
+import sys
 
-app = Flask(__name__, template_folder='templates')
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.db.core import Database
+
+app = Flask(__name__, template_folder='web/templates')
 db = Database("db.json")
 db.load()
 
